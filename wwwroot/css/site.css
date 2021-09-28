@@ -48,3 +48,9 @@ a, .btn-link {
         right: 0.75rem;
         top: 0.5rem;
     }
+
+    .img-td {
+        border-radius: 50%;
+        width: 80px;
+        height: 80px;
+    }

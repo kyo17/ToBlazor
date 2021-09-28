@@ -1,0 +1,59 @@
+﻿@page "/game/edit/{id}"
+@inject IAnimal service
+@inject NavigationManager nav
+@inject IJSRuntime js
+
+<div class="container">
+    <MudCard Elevation="7">
+        <EditForm Model="@animal" OnValidSubmit="update">
+            <MudCardHeader>
+                <MudText Color="Color.Primary" Typo="Typo.h6">Creación de catalogo de animales</MudText>
+            </MudCardHeader>
+            <MudCardContent>
+                <MudTextField @bind-Value="@animal.nombre"
+                              Label="Nombre" Variant="Variant.Outlined" T="string"></MudTextField>
+                <MudSwitch Color="Color.Primary" @bind-Checked="@animal.activo" />
+                <ToBlazor.Pages.Components.Helpers.ImageComponent.ImgFile imgSeleccionada="imagenSeleccionada" foto="@foto" />
+            </MudCardContent>
+            <MudCardActions>
+                <div class="mx-auto">
+                    <MudButton Variant="Variant.Filled" Color="Color.Primary" ButtonType="ButtonType.Submit">Guardar</MudButton>
+                    <MudButton Variant="Variant.Filled" @onclick="@(() => nav.NavigateTo("/animal"))"
+                               Color="Color.Dark" ButtonType="ButtonType.Button">Cancelar</MudButton>
+                </div>
+            </MudCardActions>
+        </EditForm>
+    </MudCard>
+</div>
+
+@code {
+    [Parameter]
+    public string id { get; set; }
+    [Parameter]
+    public VideoJuego animal { get; set; } = new VideoJuego();
+    string foto;
+
+    protected async override Task OnInitializedAsync()
+    {
+
+        animal = await service.getById(id);
+        if (!string.IsNullOrEmpty(animal.foto))
+        {
+            foto = animal.foto;
+            animal.foto = null;
+        }
+    }
+
+    private async void update()
+    {
+        await service.update(animal);
+        await js.showMessage("Confirmación", "Datos actualizados con éxito", JsService.typesSwal.success);
+        nav.NavigateTo("/animal");
+    }
+
+    private void imagenSeleccionada(string img64)
+    {
+        animal.foto = img64;
+        foto = null;
+    }
+}

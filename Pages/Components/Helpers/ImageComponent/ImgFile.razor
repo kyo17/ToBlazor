@@ -1,0 +1,82 @@
+﻿@using System.IO
+@inject IJSRuntime js
+
+<div class="mt-4 mb-4">
+    <InputFile hidden id="fileInput" OnChange="OnChange" />
+    <MudButton HtmlTag="label" for="fileInput"
+               Variant="Variant.Filled" Color="Color.Primary"
+               StartIcon="@Icons.Material.Filled.CloudUpload">
+        Seleccionar foto
+    </MudButton>
+
+</div>
+@if (img64 != null)
+{
+<div>
+    @if (progress == 100)
+    {
+        <MudAlert Severity="Severity.Success" Variant="Variant.Outlined">
+            Imagen procesada
+        </MudAlert>
+    }
+    <div class="mt-2 mb-2 text-center">
+        <img class="img-thumbnail" style="width:480px" src="data:image/jpg;base64 , @img64" />
+    </div>
+</div>
+}
+<div class="mt-3 mb-3">
+    <MudProgressLinear Buffer="true" BufferValue="@(progress)"
+                       Color="Color.Primary" Value="@progress"></MudProgressLinear>
+</div>
+@if (foto != null)
+{
+    <div>
+        <div>
+            <img class="img-thumbnail" style="width:480px" src="@foto" />
+        </div>
+    </div>
+}
+
+@code {
+    [Parameter]
+    public string foto { get; set; }
+    [Parameter]
+    public EventCallback<string> imgSeleccionada { get; set; }
+    private int progress = 0;
+    private string img64;
+
+    /* accept=".jpg, .jpeg, .png" */
+
+    private async Task OnChange(InputFileChangeEventArgs e)
+    {
+        var images = e.GetMultipleFiles();
+        foreach (var imagen in images)
+        {
+            var type = imagen.ContentType;
+            if (type.Contains("image"))
+            {
+                var bytes = new byte[imagen.Size];
+                var size = (1024 * 1024) * 7;
+                if (imagen.Size < size)
+                {
+                    await imagen.OpenReadStream(size).ReadAsync(bytes);
+                    progress = (int)((imagen.Size / bytes.Length) * 100);
+                    img64 = Convert.ToBase64String(bytes);
+                    foto = null;
+                    await imgSeleccionada.InvokeAsync(img64);
+                    StateHasChanged();
+
+                }
+                else
+                {
+                    await js.showMessage("Error", "La imagen excede el tamaño permitido", JsService.typesSwal.error);
+                }
+            }
+            else
+            {
+                await js.showMessage("Error", "Selecciona solamente imagenes", JsService.typesSwal.error);
+            }
+
+        }
+    }
+}

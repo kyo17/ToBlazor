@@ -1,0 +1,54 @@
+﻿@page "/animal/create"
+@inject IJSRuntime js
+@inject IAnimal service
+@inject NavigationManager nav
+
+<div class="container">
+    <MudCard Elevation="7">
+        <EditForm Model="@animal" OnValidSubmit="save">
+            <MudCardHeader>
+                <MudText Color="Color.Primary" Typo="Typo.h6">Creación de catalogo de animales</MudText>
+            </MudCardHeader>
+            <MudCardContent>
+                <MudTextField @bind-Value="@animal.nombre"
+                Label="Nombre" Variant="Variant.Outlined" T="string"></MudTextField>
+                <MudSwitch Color="Color.Primary" @bind-Checked="@animal.activo" />
+                <ToBlazor.Pages.Components.Helpers.ImageComponent.ImgFile
+                imgSeleccionada="imagenSeleccionada" foto="@imgURL" />
+            </MudCardContent>
+            <MudCardActions>
+                <div class="mx-auto">
+                    <MudButton Variant="Variant.Filled" Color="Color.Primary" ButtonType="ButtonType.Submit">Guardar</MudButton>
+                    <MudButton Variant="Variant.Filled" @onclick="@(() => nav.NavigateTo("/animal"))"
+                    Color="Color.Dark" ButtonType="ButtonType.Button">Cancelar</MudButton>
+                </div>
+            </MudCardActions>
+        </EditForm>
+    </MudCard>
+</div>
+
+
+@code {
+    private VideoJuego animal = new VideoJuego();
+    [Parameter]
+    public EventCallback OnSubmit { get; set; }
+    private string imgURL;
+
+    protected override void OnInitialized()
+    {
+
+    }
+
+    private async void save()
+    {
+        await service.save(animal);
+        await js.showMessage("Confirmación", "Datos agregados con éxito", JsService.typesSwal.success);
+        nav.NavigateTo("/animal");
+    }
+
+    private void imagenSeleccionada(string img64)
+    {
+        animal.foto = img64;
+        imgURL = null;
+    }
+}

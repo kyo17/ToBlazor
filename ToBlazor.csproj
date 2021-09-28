@@ -4,4 +4,32 @@
     <TargetFramework>net5.0</TargetFramework>
   </PropertyGroup>
 
+  <ItemGroup>
+    <None Remove="MudBlazor" />
+    <None Remove="Services\" />
+    <None Remove="Interfaces\" />
+    <None Remove="Pages\Components\" />
+    <None Remove="Pages\Components\Helpers\" />
+    <None Remove="Pages\Components\AnimalComponent\" />
+    <None Remove="Pages\Components\Helpers\ImageComponent\" />
+    <None Remove="Models\" />
+    <None Remove="CurrieTechnologies.Razor.SweetAlert2" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="MudBlazor" Version="5.1.4" />
+    <PackageReference Include="CurrieTechnologies.Razor.SweetAlert2" Version="5.0.2" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Services\" />
+    <Folder Include="Interfaces\" />
+    <Folder Include="Pages\Components\" />
+    <Folder Include="Pages\Components\Helpers\" />
+    <Folder Include="Pages\Components\AnimalComponent\" />
+    <Folder Include="Pages\Components\Helpers\ImageComponent\" />
+    <Folder Include="Models\" />
+    <Folder Include="wwwroot\js\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Remove="wwwroot\js\" />
+  </ItemGroup>
 </Project>

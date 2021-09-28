@@ -1,0 +1,62 @@
+﻿@page "/animal"
+@inject IAnimal service
+@inject NavigationManager nav
+@inject IJSRuntime js
+
+<div class="container">
+    <div class="mt-4 mb-4">
+        <MudButton Variant="Variant.Filled" Color="Color.Info" StartIcon="@Icons.Custom.Brands.MicrosoftAzure"
+        @onclick="@(() => nav.NavigateTo("/animal/create"))">Formulario</MudButton>
+    </div>
+    <MudTable Elevation="8" Items="@animales" Hover="true">
+        <HeaderContent>
+            <MudTh><b>Foto</b></MudTh>
+            <MudTh><b>Nombre</b></MudTh>
+            <MudTh>Estado</MudTh>
+            <MudTh>Editar</MudTh>
+            <MudTh>Eliminar</MudTh>
+        </HeaderContent>
+        <RowTemplate>
+            <MudTd><img class="img-td" src="@context.foto"/></MudTd>
+            <MudTd>@context.nombre</MudTd>
+            <MudTd>
+                @if (context.activo)
+                {
+                    <MudIcon Color="Color.Success" Icon="@Icons.Material.Filled.Check"></MudIcon>
+                    }
+                    else
+                    {
+                        <MudIcon Color="Color.Error" Icon="@Icons.Material.Filled.DoDisturb"></MudIcon>
+                    }
+            </MudTd>
+            <MudTd>
+            <a href="/game/edit/@context.idVJ"
+             ><MudIconButton Color="Color.Info" Icon="@Icons.Material.Filled.Edit"></MudIconButton></a>
+            </MudTd>
+            <MudTd>
+             <MudIconButton Icon="@Icons.Material.Filled.Delete"
+              @onclick="@(()=> delete(context.idVJ))" Color="Color.Dark"></MudIconButton>
+            </MudTd>
+        </RowTemplate>
+    </MudTable>
+</div>
+
+@code {
+    private IEnumerable<VideoJuego> animales = new List<VideoJuego>();
+
+    protected async override Task OnInitializedAsync()
+    {
+        animales = await service.getAll();
+    }
+
+    private async Task delete(string id)
+    {
+        var find = animales.First(x => x.idVJ == id);
+        var message = "Deseas eliminar este dato?";
+        if (await js.deleteSwal("Confirmación", message, JsService.typesSwal.question))
+        {
+            await service.delete(id);
+            await OnInitializedAsync();
+        }
+    }
+}
